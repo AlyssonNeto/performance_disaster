@@ -6,4 +6,8 @@ drush genu 50000
 
 Then place the "Random Users" block provided in one of the sidebars.
 
+Enable cron to run every minute so that the caching solution will work.
+
 Enable devel module, enable queries, and sort by duration.
+
+Don't forget to use the Slow Query log to show this also.
