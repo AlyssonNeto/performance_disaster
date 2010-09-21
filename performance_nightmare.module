@@ -1,0 +1,42 @@
+<?php
+// $Id$
+/**
+ * @file performance_nightmare.module
+ * A demonstration for solving database performance issues.
+ */
+
+/**
+ * Implementation of hook_block().
+ */
+function performance_nightmare_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+
+    case 'list':
+      $block['random_users']['info'] = t('Random Users');
+      return $block;
+
+    case 'view':
+      switch ($delta) {
+        case 'random_users':
+          return performance_nightmare_random_user_block();
+          break;
+      }
+  }
+}
+
+
+/**
+ * Choose 6 random accounts and present them in the block.
+ */
+function performance_nightmare_random_user_block() {
+  $block['subject'] = t('Random Users');
+  $accounts = array();
+  $result = db_query('SELECT * FROM {users} ORDER BY RAND()  LIMIT 6');
+  while ($account = db_fetch_object($result)) {
+    $usernames[] = $account->name;
+  }
+
+  $block['content'] = theme('item_list', $usernames);
+  return $block;
+}
+
