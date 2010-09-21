@@ -30,13 +30,21 @@ function performance_nightmare_block($op = 'list', $delta = 0, $edit = array()) 
  */
 function performance_nightmare_random_user_block() {
   $block['subject'] = t('Random Users');
-  $accounts = array();
-  $result = db_query('SELECT * FROM {users} ORDER BY RAND()  LIMIT 6');
-  while ($account = db_fetch_object($result)) {
-    $usernames[] = $account->name;
-  }
 
-  $block['content'] = theme('item_list', $usernames);
+ // get block contents from cache. If it's not there, build it.
+  $content_cache = cache_get('performance_nightmare_users');
+  if (!empty($content_cache)) {
+    $content = $content_cache->data;
+  }
+  if (empty($content)) {
+    $usernames = array();
+    $result = db_query('SELECT * FROM {users} ORDER BY RAND() LIMIT 6');
+    while ($account = db_fetch_object($result)) {
+      $usernames[] = $account->name;
+    }
+    $content = theme('item_list', $usernames);
+    cache_set('performance_nightmare_users', $content, 'cache', time() + 60);
+  }
+  $block['content'] = $content;
   return $block;
 }
-
