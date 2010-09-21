@@ -31,7 +31,11 @@ function performance_nightmare_block($op = 'list', $delta = 0, $edit = array()) 
 function performance_nightmare_random_user_block() {
   $block['subject'] = t('Random Users');
   $accounts = array();
-  $result = db_query('SELECT * FROM {users} ORDER BY RAND()  LIMIT 6');
+  $max_uid = db_result(db_query('SELECT MAX(uid) FROM {users}'));
+  $range = 100; // Number of user accounts in which to look for usernames.
+  $starting_point = rand(1, $max_uid - $range);
+  $result = db_query('SELECT * FROM {users} WHERE uid >= %d AND uid < %d  ORDER BY RAND() LIMIT 6', $starting_point, $starting_point + $range);
+
   while ($account = db_fetch_object($result)) {
     $usernames[] = $account->name;
   }
